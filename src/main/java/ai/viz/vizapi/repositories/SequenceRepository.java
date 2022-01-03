@@ -15,18 +15,17 @@ public class SequenceRepository {
     }
 
     public StartEndSequence addSequence(RequestSequence sequence) {
+        List<StartEndSequence> seSequences;
         String key = sequence.getScannerId() + sequence.getSeriesId();
         StartEndSequence seSequence = new StartEndSequence(sequence.getOffset(),
                 sequence.getOffset() + sequence.getThickness());
+        boolean matchingSequenceFound = false;
 
         if (!sequenceMap.containsKey(key)) {
-            List<StartEndSequence> seSequences = new LinkedList<>();
-            seSequences.add(seSequence);
+            seSequences = new LinkedList<>();
             sequenceMap.put(key, seSequences);
         } else {
-            Boolean foundMatchingSequence = false;
-            List<StartEndSequence> seSequences = sequenceMap.get(key);
-
+            seSequences = sequenceMap.get(key);
             for (StartEndSequence seq : seSequences) {
                 Integer currSeqStartOffset = seq.getStartOffset();
                 Integer currSeqEndOffset = seq.getEndOffset();
@@ -36,17 +35,17 @@ public class SequenceRepository {
                 if (Objects.equals(currSeqEndOffset, newSeqStartOffset)) {
                     seq.setEndOffset(newSeqEndOffset);
                     seSequence.setStartOffset(seq.getStartOffset());
-                    foundMatchingSequence = true;
+                    matchingSequenceFound = true;
                 } else if (Objects.equals(newSeqEndOffset, currSeqStartOffset)) {
                     seq.setStartOffset(newSeqStartOffset);
                     seSequence.setEndOffset(seq.getEndOffset());
-                    foundMatchingSequence = true;
+                    matchingSequenceFound = true;
                 }
             }
+        }
 
-            if (!foundMatchingSequence) {
-                seSequences.add(seSequence);
-            }
+        if (!matchingSequenceFound) {
+            seSequences.add(seSequence);
         }
 
         return seSequence;
