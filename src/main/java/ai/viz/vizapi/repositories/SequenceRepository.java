@@ -24,6 +24,7 @@ public class SequenceRepository {
             seSequences.add(seSequence);
             sequenceMap.put(key, seSequences);
         } else {
+            Boolean foundMatchingSequence = false;
             List<StartEndSequence> seSequences = sequenceMap.get(key);
 
             for (StartEndSequence seq : seSequences) {
@@ -35,13 +36,17 @@ public class SequenceRepository {
                 if (Objects.equals(currSeqEndOffset, newSeqStartOffset)) {
                     seq.setEndOffset(newSeqEndOffset);
                     seSequence.setStartOffset(seq.getStartOffset());
+                    foundMatchingSequence = true;
                 } else if (Objects.equals(newSeqEndOffset, currSeqStartOffset)) {
                     seq.setStartOffset(newSeqStartOffset);
                     seSequence.setEndOffset(seq.getEndOffset());
+                    foundMatchingSequence = true;
                 }
             }
 
-            seSequences.add(seSequence);
+            if (!foundMatchingSequence) {
+                seSequences.add(seSequence);
+            }
         }
 
         return seSequence;
